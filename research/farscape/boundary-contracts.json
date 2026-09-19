@@ -1,0 +1,47 @@
+{
+  "status": "proposed-adapter-contracts-not-generator-enforced",
+  "package_revision": "05c3d8fb321ed65e3db3a6a8b853019e86fb40a2",
+  "integer_abi": "uint32_t lengths; uint8_t pointees",
+  "shared_obligations": [
+    "Input is readable and output is writable for the declared extent.",
+    "Input and output storage are disjoint throughout the synchronous call.",
+    "Zero length uses valid storage unless null acceptance is established separately.",
+    "Lengths fit the C unsigned 32-bit boundary without truncation.",
+    "Caller owns both regions and prevents mutation or release until return.",
+    "Clef int array layout is not assumed to be C uint8_t array layout."
+  ],
+  "functions": [
+    {
+      "symbol": "Hacl_Hash_SHA2_hash_256",
+      "header": "include/Hacl_Hash_SHA2.h",
+      "input_parameter": 1,
+      "input_length_parameter": 2,
+      "output_parameter": 0,
+      "output_extent_octets": 32
+    },
+    {
+      "symbol": "Hacl_Hash_SHA3_sha3_256",
+      "header": "include/Hacl_Hash_SHA3.h",
+      "input_parameter": 1,
+      "input_length_parameter": 2,
+      "output_parameter": 0,
+      "output_extent_octets": 32
+    },
+    {
+      "symbol": "Hacl_Hash_SHA3_shake128",
+      "header": "include/Hacl_Hash_SHA3.h",
+      "input_parameter": 2,
+      "input_length_parameter": 3,
+      "output_parameter": 0,
+      "output_length_parameter": 1
+    },
+    {
+      "symbol": "Hacl_Hash_SHA3_shake256",
+      "header": "include/Hacl_Hash_SHA3.h",
+      "input_parameter": 2,
+      "input_length_parameter": 3,
+      "output_parameter": 0,
+      "output_length_parameter": 1
+    }
+  ]
+}

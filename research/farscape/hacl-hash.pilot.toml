@@ -1,0 +1,29 @@
+# Research-only ABI generation. Buffer extents and ownership require the
+# checked operation adapter described in boundary-contracts.json.
+[library]
+name = "hacl"
+headers = ["../../../hacl-packages/include/Hacl_Hash_SHA2.h", "../../../hacl-packages/include/Hacl_Hash_SHA3.h"]
+include_paths = ["../../../hacl-packages/include", "../../../hacl-packages/karamel/include", "../../../hacl-packages/karamel/krmllib/dist/minimal"]
+defines = []
+macro_prefixes = ["Hacl_Hash_"]
+
+[output]
+mode = "fidelity"
+directory = "../../artifacts/hacl-binding/Bindings/Hacl"
+
+[options]
+c_header_mode = true
+descriptor_only_dependencies = true
+generate_descriptors = true
+
+[[namespace]]
+name = "Fidelity.Cryptography.Reference.Hacl.Sha2"
+description = "Raw reference SHA-256 ABI"
+library = "hacl"
+functions = ["Hacl_Hash_SHA2_hash_256"]
+
+[[namespace]]
+name = "Fidelity.Cryptography.Reference.Hacl.Sha3"
+description = "Raw reference SHA-3 and SHAKE ABI"
+library = "hacl"
+functions = ["Hacl_Hash_SHA3_sha3_256", "Hacl_Hash_SHA3_shake128", "Hacl_Hash_SHA3_shake256"]

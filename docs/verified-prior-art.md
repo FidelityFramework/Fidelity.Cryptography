@@ -4,6 +4,8 @@ Fidelity can reuse cryptographic specifications, algorithm decompositions and pr
 
 This review checked upstream documentation and published research descriptions on 2026-09-18. It did not replay upstream proof builds. The [revision record](reference-revisions.md) identifies the inspected repositories and the scope of inspection.
 
+The subsequent [HACL implementation review](hacl-implementation-roadmap.md) traces local source contracts and packaging behavior, with runnable C checks and first-party Clef scaffolds. It distinguishes the older package extraction from the newer HACL* source checkout.
+
 ## HACL*, EverCrypt and libcrux
 
 [HACL*](https://github.com/hacl-star/hacl-star/blob/504c2987452f87fe44bce9b9f12e19d6e051761f/README.md) provides Low*/F* implementations with memory-safety, functional-correctness and secret-independence arguments. KaRaMeL generates C. Vale contributes selected assembly implementations, while EverCrypt supplies provider selection. These are useful references for the supporting symmetric primitives and for the division between an operation and its implementations.

@@ -1,0 +1,44 @@
+module Fidelity.Cryptography.Examples.ProviderSelection
+
+open Fidelity.Cryptography.Core.Contracts
+open Fidelity.Cryptography.Providers.Admission
+
+// Synthetic fixtures, not capability declarations for any existing device.
+let softwareCandidate = {
+    Name = "software-fixture"
+    Environment = "test-environment"
+    Suites = [ Aes256Gcm ]
+    AcceptsSoftwareKeys = true
+    ProtectedKeyDomain = None
+    MaxMessageLength = 4096
+    MaxAssociatedDataLength = 256
+    PlaintextRelease = AfterAuthentication
+}
+
+let protectedCandidate = {
+    Name = "device-fixture"
+    Environment = "test-environment"
+    Suites = [ Aes256Gcm ]
+    AcceptsSoftwareKeys = false
+    ProtectedKeyDomain = Some "device-A"
+    MaxMessageLength = 4096
+    MaxAssociatedDataLength = 256
+    PlaintextRelease = RequiresPrivateStaging
+}
+
+let request = {
+    Suite = Aes256Gcm
+    Environment = "test-environment"
+    Key = ProtectedKey "device-A"
+    MessageLength = 128
+    AssociatedDataLength = 32
+    PrivateStagingCapacity = 128
+}
+
+// Selects device-fixture even though software-fixture appears first.
+let selected = selectCandidate request [ softwareCandidate; protectedCandidate ]
+
+// Both cases must return NoMatchingCandidate.
+let noKeyExportFallback = selectCandidate request [ softwareCandidate ]
+let noUnauthenticatedRelease =
+    selectCandidate { request with PrivateStagingCapacity = 127 } [ protectedCandidate ]

@@ -1,0 +1,40 @@
+module Fidelity.Cryptography.Core.Contracts
+
+// Source scaffold. These public records describe candidate selection, not
+// evidence admission, device discovery or possession of a cryptographic key.
+
+type AeadSuite =
+    | Aes256Gcm
+    | ChaCha20Poly1305
+
+type KeyRequirement =
+    | SoftwareKey
+    | ProtectedKey of domain: string
+
+type PlaintextRelease =
+    | AfterAuthentication
+    | RequiresPrivateStaging
+
+type ProviderFacts = {
+    Name: string
+    Environment: string
+    Suites: AeadSuite list
+    AcceptsSoftwareKeys: bool
+    ProtectedKeyDomain: string option
+    MaxMessageLength: int
+    MaxAssociatedDataLength: int
+    PlaintextRelease: PlaintextRelease
+}
+
+type AeadRequirement = {
+    Suite: AeadSuite
+    Environment: string
+    Key: KeyRequirement
+    MessageLength: int
+    AssociatedDataLength: int
+    PrivateStagingCapacity: int
+}
+
+type SelectionError =
+    | InvalidLengths
+    | NoMatchingCandidate

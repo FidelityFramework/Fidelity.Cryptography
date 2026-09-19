@@ -1,0 +1,15 @@
+[package]
+name = "Fidelity.Cryptography.Scaffold"
+version = "0.1.0"
+description = "Experimental scalar arithmetic and candidate-provider contracts; native acceptance pending"
+
+[compilation]
+target = "library"
+
+[build]
+output_kind = "library"
+sources = [
+    "Core/Contracts.clef",
+    "Hash/Sha256.clef",
+    "Providers/Admission.clef"
+]

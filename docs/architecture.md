@@ -2,7 +2,7 @@
 
 Fidelity.Cryptography owns reusable cryptographic operations and their first-party Clef implementations. Fidelity.Platform owns the hardware and environment facts needed to execute them. KeyStation and the credential authority retain application policy, ceremonies and delegation.
 
-The boundaries below are design contracts. Executable packages will be introduced with their implementation and evidence, without placeholder functions that return successful results.
+The boundaries below govern the [initial source scaffold](../src/README.md) and later accepted packages. The scaffold contains real scalar arithmetic and candidate filtering. An unfinished cryptographic operation has no successful placeholder path.
 
 ## Ownership
 
@@ -21,7 +21,7 @@ Low-level provider capabilities belong in Platform. Algorithm identifiers and cr
 
 ## Package plan
 
-The planned package divisions are Core, Symmetric, Hash, Random, Kdf, Kem, Signature, Merkle and Providers. Protocol integrations can depend on those packages independently. Names here describe divisions of responsibility, not existing `.fidproj` exports.
+The planned package divisions are Core, Symmetric, Hash, Mac, Random, Kdf, Kem, Signature, Merkle and Providers. Protocol integrations can depend on those packages independently. The current experimental project groups Core, Hash and Providers for source development. The remaining names describe divisions of responsibility before separate package exports are established.
 
 An embedded verifier should link only its selected verification routines and hash dependencies. Key generation, signing and unused parameter sets should remain outside that image. A server may retain several admitted providers and choose among them under an explicit policy. A device requiring a protected key slot selects a provider that can operate on that slot.
 

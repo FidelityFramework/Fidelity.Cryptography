@@ -1,10 +1,11 @@
 # Inspected reference revisions
 
-These revisions identify upstream material inspected on 2026-09-18. Review covered documentation and selected repository trees. No upstream proof builds were replayed and no implementation code was imported. Algorithm admission requires the more detailed evidence record in [Verification](verification.md).
+These revisions identify upstream material inspected on 2026-09-18. The HACL follow-up also traced source contracts and built selected package C files through the [reference harness](../research/hacl-reference/README.md). No upstream proof builds were replayed and no upstream implementation files were copied here. Algorithm admission requires the more detailed evidence record in [Verification](verification.md).
 
 | Reference | Revision | Material and purpose |
 | --- | --- | --- |
 | [HACL*](https://github.com/hacl-star/hacl-star/tree/504c2987452f87fe44bce9b9f12e19d6e051761f) | `504c2987452f87fe44bce9b9f12e19d6e051761f` | README and algorithm tree, Low*/KaRaMeL and EverCrypt architecture |
+| [HACL packages](https://github.com/cryspen/hacl-packages/tree/05c3d8fb321ed65e3db3a6a8b853019e86fb40a2) | `05c3d8fb321ed65e3db3a6a8b853019e86fb40a2` | Extracted C, headers, wrappers and vectors, with selected portable C execution |
 | [libcrux](https://github.com/celabshq/libcrux/tree/39c4f2f267c718b88f746fae216511321bd24aac) | `39c4f2f267c718b88f746fae216511321bd24aac` | Project, ML-KEM and ML-DSA documentation, detailed ML-KEM verification status |
 | [Cryptol specifications](https://github.com/GaloisInc/cryptol-specs/tree/c3d6d7dfbc72443f97094133c3d1913bc9a2b8cc) | `c3d6d7dfbc72443f97094133c3d1913bc9a2b8cc` | Specification catalogue and PQ algorithm directories |
 | [Apple corecrypto](https://github.com/apple/corecrypto/tree/9612a959abb6eac0aac3ee6a7245c46365c9d81b) | `9612a959abb6eac0aac3ee6a7245c46365c9d81b` | Verification README, soundness account and license, architectural reference |

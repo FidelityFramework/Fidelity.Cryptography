@@ -1,0 +1,47 @@
+module Fidelity.Cryptography.Providers.Admission
+
+open Fidelity.Cryptography.Core.Contracts
+
+// Candidate filtering only. An admitted implementation, actual key handle,
+// nonce reservation and buffer ownership are still required before execution.
+
+let rec private hasSuite wanted suites =
+    match suites with
+    | [] -> false
+    | head :: tail -> head = wanted || hasSuite wanted tail
+
+let private matchesKey requirement (provider: ProviderFacts) =
+    match requirement with
+    | SoftwareKey -> provider.AcceptsSoftwareKeys
+    | ProtectedKey domain ->
+        match provider.ProtectedKeyDomain with
+        | Some offered -> offered = domain
+        | None -> false
+
+let private canStage (request: AeadRequirement) (provider: ProviderFacts) =
+    match provider.PlaintextRelease with
+    | AfterAuthentication -> true
+    | RequiresPrivateStaging -> request.PrivateStagingCapacity >= request.MessageLength
+
+let private matches (request: AeadRequirement) (provider: ProviderFacts) =
+    provider.Environment = request.Environment
+    && hasSuite request.Suite provider.Suites
+    && matchesKey request.Key provider
+    && request.MessageLength <= provider.MaxMessageLength
+    && request.AssociatedDataLength <= provider.MaxAssociatedDataLength
+    && canStage request provider
+
+let selectCandidate (request: AeadRequirement) (candidates: ProviderFacts list) =
+    let rec choose remaining =
+        match remaining with
+        | [] -> Error NoMatchingCandidate
+        | candidate :: rest ->
+            if matches request candidate then Ok candidate
+            else choose rest
+
+    if request.MessageLength < 0
+       || request.AssociatedDataLength < 0
+       || request.PrivateStagingCapacity < 0 then
+        Error InvalidLengths
+    else
+        choose candidates

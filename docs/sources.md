@@ -21,6 +21,8 @@ External status checked 2026-09-18. These references establish the design baseli
 
 ## Implementations and protocols
 
+The [HACL roadmap](hacl-implementation-roadmap.md) records the deeper review of the local `hacl-star` and `hacl-packages` checkouts, their differing provenance, code scaffolds and executed reference checks.
+
 | Source | Use |
 | --- | --- |
 | [PQShield: Falcon without floating-point](https://pqshield.com/falcon-without-floating-point/) | Research direction for fixed-point signing |

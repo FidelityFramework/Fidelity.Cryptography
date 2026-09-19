@@ -4,6 +4,8 @@ Each implementation needs evidence for a precise claim. Conformance vectors, for
 
 No algorithm or hardware provider is accepted by this repository yet. Acceptance records will accompany implemented operations and their exact revisions.
 
+The [HACL roadmap](hacl-implementation-roadmap.md#reproduce-the-current-checks) records the first executed checks: portable C vectors and AEAD failure behavior, exact-integer host validation of the SHA-256 source, provider-policy cases and Farscape declaration generation. One SHA-256 native known-answer example also passed, with compiler range findings still open. Each result retains its execution boundary. None establishes full native acceptance or an admitted cryptographic proof.
+
 ## Evidence layers
 
 | Claim | Required evidence |

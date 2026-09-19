@@ -2,7 +2,7 @@
 
 First-party Clef cryptography for the Fidelity Framework, with software implementations and hardware providers selected through [Fidelity.Platform](../Fidelity.Platform/README.md). The intended targets range from freestanding MCUs and unikernels to hosted desktop, server, mobile and browser applications.
 
-This repository establishes the architecture and implementation requirements. Algorithm implementations, provider bindings and cryptographic acceptance evidence are pending. It contains no usable cryptographic package yet.
+This repository contains the architecture, an initial Clef source scaffold and executable reference tooling. A scalar SHA-256 implementation, provider-selection examples and a HACL hash binding pilot are present. The hash's native `abc` smoke passed with open range findings. Complete native validation and cryptographic proof admission remain pending. It contains no accepted cryptographic provider yet.
 
 The implementation direction is native Clef. Farscape bindings provide access to vendor libraries and independent reference implementations. Applications use the same operation contracts with either provider, subject to the selected key-custody policy. Hardware availability never silently changes an algorithm, credential encoding or protocol.
 
@@ -35,6 +35,14 @@ The implementation direction is native Clef. Farscape bindings provide access to
 | [Numeric selection and Falcon](docs/numeric-selection-and-falcon.md) | Posit/quire accumulation, braid joins, branch analysis and sampling bounds |
 | [Reference revisions](docs/reference-revisions.md) | Pinned upstream sources and inspection scope |
 | [Implementation plan](docs/implementation-plan.md) | Deliverables and acceptance criteria |
+| [HACL implementation roadmap](docs/hacl-implementation-roadmap.md) | Source scaffold, worked examples, C reference tests and binding experiment |
 | [Sources](docs/sources.md) | Standards baseline, first-party references and project context |
 
 Cross-repository links assume sibling checkouts. Standards and external implementation status were checked on 2026-09-18. The [source policy](docs/sources.md#revision-policy) requires immutable revisions when code or test material is imported.
+
+## Working scaffold
+
+- [Clef source](src/README.md) and [SHA-256 example](examples/hash/Main.clef).
+- [HACL C reference harness](research/hacl-reference/README.md), with pinned inputs and 775 selected checks.
+- [Farscape hash pilot](research/farscape/README.md), with proposed buffer contracts.
+- [Provider-selection example](examples/provider-selection/README.md) and [joint proof obligations](proofs/README.md).

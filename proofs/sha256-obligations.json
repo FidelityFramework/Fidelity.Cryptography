@@ -1,0 +1,27 @@
+{
+  "status": "proposed-law-inventory-not-an-admitted-proof-package",
+  "source": "src/Hash/Sha256.clef",
+  "ownership": "CCS derives program facts and records joint applications in the PHG; Composer consumes their established consequences.",
+  "obligations": [
+    {
+      "id": "sha256.word-arithmetic",
+      "participants": ["operands", "exact intermediate", "modulus 2^32", "reduced result", "selected realization"],
+      "required": ["nonnegative canonical operands", "capacity before reduction", "result congruence", "0 <= result < 2^32"],
+      "reasoning": ["DTS ranges", "local arithmetic", "registered modular law", "lowering correspondence"]
+    },
+    {
+      "id": "sha256.schedule-and-compression",
+      "participants": ["message block", "state before", "64-word schedule", "round index", "state after", "reference compression specification"],
+      "required": ["big-endian word decoding", "index and shift bounds", "schedule recurrence", "round invariant", "feed-forward correspondence"],
+      "reasoning": ["DTS ranges", "loop invariants", "domain laws", "relational correspondence"]
+    },
+    {
+      "id": "sha256.padding-and-output",
+      "participants": ["input octets", "input length", "padding position", "encoded bit length", "block sequence", "digest destination"],
+      "required": ["each input value is an octet", "length within admitted profile", "exact padding and length encoding", "destination extent exactly 32 octets", "input validity throughout operation"],
+      "reasoning": ["boundary contract", "DTS ranges", "padding law", "ownership and layout"]
+    }
+  ],
+  "invalidation": ["source or constants", "input profile", "representation or arithmetic construction", "target declaration", "compiler lowering", "theorem binding or foundational dependency"],
+  "admission": "Each law requires a checked proof quotation or theorem binding. This file supplies neither and is not loaded by the compiler."
+}

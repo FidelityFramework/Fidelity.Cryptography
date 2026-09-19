@@ -1,10 +1,12 @@
 # Implementation plan
 
-The repository currently contains design documents. There are no implemented algorithms, exported Clef packages or accepted hardware providers. This plan defines deliverables so those statuses can advance independently, with evidence attached to each operation.
+The repository now contains a scalar Clef SHA-256 scaffold, provider-selection code, executable HACL C reference tests and a generated-ABI experiment. A native hash smoke passed with open range findings. Complete native validation and proof admission are pending. The [HACL roadmap](hacl-implementation-roadmap.md) records the implementation slices, runnable commands and worked API examples. No hardware provider has been accepted.
 
 ## First implementation
 
-Start with the operation/key contracts and a software AES-256-GCM path for bounded MBS records. Implement its hash/KDF/random dependencies as needed, with conformance tests before device integration. Fix the versioned record format and nonce/commit protocol alongside MBS.
+The first source slice is SHA-256 with explicit modular arithmetic, plus provider candidate selection that preserves suite and key custody. Complete its native acceptance, then extend the reusable primitives through SHA-3/SHAKE, HMAC/HKDF and owned random state. The first storage integration remains software AES-256-GCM for bounded MBS records. Fix the versioned record format and nonce/commit protocol alongside MBS.
+
+The inspected HACL snapshots do not provide portable AES-GCM for the MCU/ARM targets. That implementation remains a separate AES/GHASH/GCM task. ChaCha20-Poly1305 supplies the initial portable AEAD reference fixture without changing the MBS suite.
 
 Use the EK-RA6M5 as the first protected-key provider study. Pin the vendor sources, identify the SCE key-use and custody mechanisms, and write the capability record. A Farscape binding can establish device behavior and comparative evidence while a native Clef driver is developed. Both remain separate implementations with separate acceptance records.
 

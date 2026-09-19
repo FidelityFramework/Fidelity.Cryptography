@@ -1,0 +1,179 @@
+module Fidelity.Cryptography.Hash.Sha256
+
+// Scalar SHA-256 scaffold. Native abc smoke passed; range/proof admission is pending.
+// The word size is an algorithmic modulus, never a source representation type.
+let private wordModulus: int = 4294967296
+let private wordMask: int = 4294967295
+
+type HashError =
+    | InvalidDigestLength
+    | InputTooLong
+    | InvalidOctet of int
+
+let private roundConstants: int array =
+    [| 1116352408; 1899447441; 3049323471; 3921009573
+       961987163; 1508970993; 2453635748; 2870763221
+       3624381080; 310598401; 607225278; 1426881987
+       1925078388; 2162078206; 2614888103; 3248222580
+       3835390401; 4022224774; 264347078; 604807628
+       770255983; 1249150122; 1555081692; 1996064986
+       2554220882; 2821834349; 2952996808; 3210313671
+       3336571891; 3584528711; 113926993; 338241895
+       666307205; 773529912; 1294757372; 1396182291
+       1695183700; 1986661051; 2177026350; 2456956037
+       2730485921; 2820302411; 3259730800; 3345764771
+       3516065817; 3600352804; 4094571909; 275423344
+       430227734; 506948616; 659060556; 883997877
+       958139571; 1322822218; 1537002063; 1747873779
+       1955562222; 2024104815; 2227730452; 2361852424
+       2428436474; 2756734187; 3204031479; 3329325298 |]
+
+let private initialState () : int array =
+    [| 1779033703; 3144134277; 1013904242; 2773480762
+       1359893119; 2600822924; 528734635; 1541459225 |]
+
+// All call sites use a count in [1, 31] and a value in [0, wordMask].
+// Exact intermediate capacity must be retained before the explicit reduction.
+let private rotateRight (value: int) (count: int) : int =
+    (value >>> count) ||| ((value <<< (32 - count)) % wordModulus)
+
+let private smallSigma0 (value: int) : int =
+    (rotateRight value 7) ^^^ (rotateRight value 18) ^^^ (value >>> 3)
+
+let private smallSigma1 (value: int) : int =
+    (rotateRight value 17) ^^^ (rotateRight value 19) ^^^ (value >>> 10)
+
+let private bigSigma0 (value: int) : int =
+    (rotateRight value 2) ^^^ (rotateRight value 13) ^^^ (rotateRight value 22)
+
+let private bigSigma1 (value: int) : int =
+    (rotateRight value 6) ^^^ (rotateRight value 11) ^^^ (rotateRight value 25)
+
+let private choose (x: int) (y: int) (z: int) : int =
+    (x &&& y) ^^^ ((wordMask ^^^ x) &&& z)
+
+let private majority (x: int) (y: int) (z: int) : int =
+    (x &&& y) ^^^ (x &&& z) ^^^ (y &&& z)
+
+let private readWord (input: int array) (offset: int) : int =
+    (Array.get input offset) * 16777216
+    + (Array.get input (offset + 1)) * 65536
+    + (Array.get input (offset + 2)) * 256
+    + Array.get input (offset + 3)
+
+let private writeWord (output: int array) (offset: int) (value: int) : unit =
+    Array.set output offset ((value >>> 24) % 256)
+    Array.set output (offset + 1) ((value >>> 16) % 256)
+    Array.set output (offset + 2) ((value >>> 8) % 256)
+    Array.set output (offset + 3) (value % 256)
+
+// Private preconditions: state has 8 words, schedule has 64 words, and block
+// supplies 64 valid octets from offset. These arrays have distinct storage.
+let private compress
+    (state: int array)
+    (schedule: int array)
+    (block: int array)
+    (offset: int) : unit =
+    let mutable index: int = 0
+    while index < 16 do
+        Array.set schedule index (readWord block (offset + index * 4))
+        index <- index + 1
+    while index < 64 do
+        let word =
+            smallSigma1 (Array.get schedule (index - 2))
+            + Array.get schedule (index - 7)
+            + smallSigma0 (Array.get schedule (index - 15))
+            + Array.get schedule (index - 16)
+        Array.set schedule index (word % wordModulus)
+        index <- index + 1
+
+    let mutable a: int = Array.get state 0
+    let mutable b: int = Array.get state 1
+    let mutable c: int = Array.get state 2
+    let mutable d: int = Array.get state 3
+    let mutable e: int = Array.get state 4
+    let mutable f: int = Array.get state 5
+    let mutable g: int = Array.get state 6
+    let mutable h: int = Array.get state 7
+    index <- 0
+    while index < 64 do
+        let t1 =
+            (h + bigSigma1 e + choose e f g
+             + Array.get roundConstants index + Array.get schedule index) % wordModulus
+        let t2 = (bigSigma0 a + majority a b c) % wordModulus
+        h <- g
+        g <- f
+        f <- e
+        e <- (d + t1) % wordModulus
+        d <- c
+        c <- b
+        b <- a
+        a <- (t1 + t2) % wordModulus
+        index <- index + 1
+
+    Array.set state 0 ((Array.get state 0 + a) % wordModulus)
+    Array.set state 1 ((Array.get state 1 + b) % wordModulus)
+    Array.set state 2 ((Array.get state 2 + c) % wordModulus)
+    Array.set state 3 ((Array.get state 3 + d) % wordModulus)
+    Array.set state 4 ((Array.get state 4 + e) % wordModulus)
+    Array.set state 5 ((Array.get state 5 + f) % wordModulus)
+    Array.set state 6 ((Array.get state 6 + g) % wordModulus)
+    Array.set state 7 ((Array.get state 7 + h) % wordModulus)
+
+// Octets use int with an explicit range check while the public octet/buffer
+// contract is being developed. Destination writes occur only after validation
+// and compression. The caller must exclude concurrent mutation of the input.
+let hashInto (input: int array) (digest: int array) : Result<unit, HashError> =
+    let length = Array.length input
+    if Array.length digest <> 32 then
+        Error InvalidDigestLength
+    elif length >= 2305843009213693952 then
+        Error InputTooLong
+    else
+        let mutable index: int = 0
+        let mutable invalidIndex: int = -1
+        while index < length && invalidIndex = -1 do
+            let value = Array.get input index
+            if value < 0 || value > 255 then
+                invalidIndex <- index
+            else
+                ()
+            index <- index + 1
+        if invalidIndex <> -1 then
+            Error (InvalidOctet invalidIndex)
+        else
+            let state = initialState ()
+            let schedule: int array = Array.zeroCreate 64
+            let finalBlock: int array = Array.zeroCreate 64
+            let mutable offset: int = 0
+            while length - offset >= 64 do
+                compress state schedule input offset
+                offset <- offset + 64
+
+            let remaining = length - offset
+            index <- 0
+            while index < remaining do
+                Array.set finalBlock index (Array.get input (offset + index))
+                index <- index + 1
+            Array.set finalBlock remaining 128
+            if remaining >= 56 then
+                compress state schedule finalBlock 0
+                index <- 0
+                while index < 64 do
+                    Array.set finalBlock index 0
+                    index <- index + 1
+            else
+                ()
+
+            // Encode the bit length as two mathematical words. This avoids
+            // requiring a single machine integer to hold length * 8.
+            let lengthHigh = length / 536870912
+            let lengthLow = (length % 536870912) * 8
+            writeWord finalBlock 56 lengthHigh
+            writeWord finalBlock 60 lengthLow
+            compress state schedule finalBlock 0
+            index <- 0
+            while index < 8 do
+                writeWord digest (index * 4) (Array.get state index)
+                index <- index + 1
+            Ok ()
